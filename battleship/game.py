@@ -29,6 +29,45 @@ class Game:
             self.ai = AI(co, pl, self.ui)
             self.us = User(pl, co, self.ui)
 
+    @classmethod
+    def from_boards(
+        cls,
+        size=6,
+        ships_config=None,
+        ui=None,
+        mode="pve",
+        p1_board=None,
+        p2_board=None,
+        ai_board=None,
+        human_name="Игрок",
+    ):
+        game = cls.__new__(cls)
+        game.size = size
+        if ui is None:
+            from .ui_console import ConsoleUI
+            ui = ConsoleUI()
+        game.ui = ui
+        game.ships_config = ships_config or [3, 2, 2, 1, 1, 1, 1]
+        game.win_count = len(game.ships_config)
+        game.mode = mode
+
+        if game.mode == "pvp":
+            if p1_board is None or p2_board is None:
+                raise ValueError("pvp requires p1_board and p2_board")
+            game.p1 = HumanPlayer(p1_board, p2_board, game.ui, "Игрок 1")
+            game.p2 = HumanPlayer(p2_board, p1_board, game.ui, "Игрок 2")
+            game.ai = None
+            game.us = None
+        else:
+            if p1_board is None:
+                p1_board = game.random_board()
+            if ai_board is None:
+                ai_board = game.random_board()
+            ai_board.hid = True
+            game.ai = AI(ai_board, p1_board, game.ui)
+            game.us = HumanPlayer(p1_board, ai_board, game.ui, human_name)
+        return game
+
     def random_board(self):
         board = None
         while board is None:
