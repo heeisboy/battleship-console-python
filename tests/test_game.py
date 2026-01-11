@@ -1,21 +1,12 @@
-import importlib.util
+import sys
 from pathlib import Path
 import unittest
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-def load_main_module():
-    root = Path(__file__).resolve().parents[1]
-    main_path = root / "morskoi-boi" / "main.py"
-    spec = importlib.util.spec_from_file_location("morskoi_boi_main", main_path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-MAIN = load_main_module()
-Board = MAIN.Board
-Game = MAIN.Game
-HumanPlayer = MAIN.HumanPlayer
+from battleship.core import Board
+from battleship.game import Game
+from battleship.players import HumanPlayer
 
 
 class DummyUI:

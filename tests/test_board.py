@@ -1,23 +1,16 @@
-import importlib.util
+import sys
 from pathlib import Path
 import unittest
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-def load_main_module():
-    root = Path(__file__).resolve().parents[1]
-    main_path = root / "morskoi-boi" / "main.py"
-    spec = importlib.util.spec_from_file_location("morskoi_boi_main", main_path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-MAIN = load_main_module()
-Dot = MAIN.Dot
-Ship = MAIN.Ship
-Board = MAIN.Board
-BoardWrongShipException = MAIN.BoardWrongShipException
-BoardUsedException = MAIN.BoardUsedException
+from battleship.core import (
+    Dot,
+    Ship,
+    Board,
+    BoardWrongShipException,
+    BoardUsedException,
+)
 
 
 def build_board_with_ship(bow, length, orientation=0, size=6):
