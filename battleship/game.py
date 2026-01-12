@@ -1,7 +1,52 @@
+from dataclasses import dataclass
 from random import randint
 
 from .core import Board, Dot, Ship, BoardWrongShipException
 from .players import AI, HumanPlayer, User
+
+SHIPS_PRESETS = {
+    6: [3, 2, 2, 1, 1, 1, 1],
+    8: [3, 2, 2, 2, 1, 1, 1, 1],
+    10: [4, 3, 3, 2, 2, 2, 1, 1, 1, 1],
+}
+
+
+def ships_config_for_size(size):
+    return list(SHIPS_PRESETS.get(size, SHIPS_PRESETS[6]))
+
+
+@dataclass(frozen=True)
+class GameConfig:
+    size: int = 6
+    mode: str = "pve"
+    ships_config: list | None = None
+
+    def resolved_ships_config(self):
+        if self.ships_config is not None:
+            return list(self.ships_config)
+        return ships_config_for_size(self.size)
+
+
+def create_game(config, ui=None, p1_board=None, p2_board=None, ai_board=None, human_name="Игрок"):
+    ships_config = config.resolved_ships_config()
+    if config.mode == "pvp":
+        return Game.from_boards(
+            size=config.size,
+            ships_config=ships_config,
+            ui=ui,
+            mode="pvp",
+            p1_board=p1_board,
+            p2_board=p2_board,
+        )
+    return Game.from_boards(
+        size=config.size,
+        ships_config=ships_config,
+        ui=ui,
+        mode="pve",
+        p1_board=p1_board,
+        ai_board=ai_board,
+        human_name=human_name,
+    )
 
 
 class Game:
